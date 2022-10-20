@@ -27,9 +27,78 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     let BLE_Service_UUID = CBUUID.init(string: "6e400001-b5a3-f393-e0a9-e50e24dcca9e")
     let BLE_Characteristic_uuid_Rx = CBUUID.init(string: "6e400003-b5a3-f393-e0a9-e50e24dcca9e")
     let BLE_Characteristic_uuid_Tx  = CBUUID.init(string: "6e400002-b5a3-f393-e0a9-e50e24dcca9e")
+    var isConnected = false
+
+    @IBOutlet weak var clickButton: UIButton!
+    @IBOutlet weak var startButton: UIButton!
     
+    @IBOutlet weak var clicksLabel: UILabel!
     @IBOutlet weak var connectStatusLbl: UILabel!
-    @IBOutlet weak var dataLbl: UILabel!
+    @IBOutlet weak var timeLabel: UILabel!
+    
+    var clicks = 0 {
+        didSet {
+            clicksLabel.text = "Clicks: \(clicks)"
+        }//didSet
+    }//clicks
+    
+    var time = 10 {
+        didSet {
+            if isConnected == true {
+                timeLabel.text = "\(time)"
+            }//if
+        }//didSet
+    }//time
+    
+    func countDownTimer() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+            if self.time > 0 {
+                //self.timeLabel.text = String(self.time)
+                self.time = self.time - 1
+                self.countDownTimer()
+            }//if
+            else {
+                self.timeLabel.text = "Game Over!"
+                self.startButton.isUserInteractionEnabled = true
+                self.clickButton.isUserInteractionEnabled = false
+            }//else
+        }//dispatch
+    }//countDownTimer
+    
+    
+    @IBAction func startButtonAction(_ sender: Any) {
+        startButton.isUserInteractionEnabled = false
+        clickButton.isUserInteractionEnabled = true
+        
+        time = 10
+        clicks = 0
+        
+        countDownTimer()
+    }
+    
+    
+    @IBAction func clickButtonAction(_ sender: Any) {
+        clicks = clicks + 1
+    }
+    
+    
+
+    
+    @IBAction func clicker(_ sender: UIButton) {
+        if isConnected == true {
+            countDownTimer()
+        }//if
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // This function is called before the storyboard view is loaded onto the screen.
     // Runs only once.
@@ -37,8 +106,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         super.viewDidLoad()
         
         // Set the label to say "Disconnected" and make the text red
+        
         connectStatusLbl.text = "Disconnected"
         connectStatusLbl.textColor = UIColor.red
+        clicksLabel.text = ""
+        timeLabel.text = ""
+        startButton.isUserInteractionEnabled = true
+        clickButton.isUserInteractionEnabled = false
         
         // Initialize CoreBluetooth Central Manager object which will be necessary
         // to use CoreBlutooth functions
@@ -97,20 +171,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     // Start scanning for peripherals
     func startScan() {
-        print("Now Scanning...")
-        print("Service ID Search: \(BLE_Service_UUID)")
+        //print("Now Scanning...")
+        //print("Service ID Search: \(BLE_Service_UUID)")
         
-        // Make an empty list of peripherals that were found
         peripheralList = []
         
-        // Stop the timer
         self.timer.invalidate()
         
-        // Call method in centralManager class that actually begins the scanning.
-        // We are targeting services that have the same UUID value as the BLE_Service_UUID variable.
-        // Use a timer to wait 10 seconds before calling cancelScan().
-        centralManager?.scanForPeripherals(withServices: [BLE_Service_UUID],
-                                           options: [CBCentralManagerScanOptionAllowDuplicatesKey:false])
+        centralManager?.scanForPeripherals(withServices: [BLE_Service_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey:false])
         Timer.scheduledTimer(withTimeInterval: 10, repeats: false) {_ in
             self.cancelScan()
         }
@@ -175,11 +243,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     // Called when the central manager disconnects from the peripheral
-   // func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-   //     print("Disconnected")
-   //     connectStatusLbl.text = "Disconnected"
-   //     connectStatusLbl.textColor = UIColor.red
-   // }
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        print("Disconnected")
+        connectStatusLbl.text = "Disconnected"
+        connectStatusLbl.textColor = UIColor.red
+    }
     
     // Called when the correct peripheral's services are discovered
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -207,6 +275,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 print("Service found")
                 connectStatusLbl.text = "Connected!"
                 connectStatusLbl.textColor = UIColor.blue
+                isConnected = true
+                
                 
                 // Search for the characteristics of the service
                 peripheral.discoverCharacteristics(nil, for: service)
@@ -289,8 +359,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let receivedString = NSString(data: characteristicValue,
                                       encoding: String.Encoding.utf8.rawValue)
         else { return }
-        dataLbl.text = "Value: " + (receivedString as String)
-        
+        //dataLbl.text = "Value: " + (receivedString as String)
+        //dataLbl.text = ("Start!")
         NotificationCenter.default.post(name:NSNotification.Name(rawValue: "Notify"), object: self)
     }
     

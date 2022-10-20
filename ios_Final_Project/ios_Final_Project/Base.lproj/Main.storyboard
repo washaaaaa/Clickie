@@ -22,8 +22,8 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZqT-x8-Wkf">
-                                <rect key="frame" x="171.5" y="433" width="71" height="30"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZqT-x8-Wkf">
+                                <rect key="frame" x="177.5" y="433" width="59" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -39,7 +39,6 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="connectStatusLBL" destination="Zxm-Wy-E6E" id="Kk5-Nx-LGZ"/>
                         <outlet property="connectStatusLbl" destination="Zxm-Wy-E6E" id="Sv0-9a-Bcp"/>
                         <outlet property="dataLbl" destination="ZqT-x8-Wkf" id="gpD-Ld-NyF"/>
                     </connections>
